@@ -7,6 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1PVSSWcxh56vQJ_89tgWxZMjku36C_REm
 """
 
+import os
 import gradio as gr
 import torch
 import torch.nn as nn
@@ -82,11 +83,15 @@ class Vocabulary:
 # loading stuff
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# loading vocab
+# loading vocab and model (must be in same folder as this script)
+if not os.path.isfile('vocab.pkl'):
+    raise FileNotFoundError("vocab.pkl not found. Copy it from your notebook output into this folder.")
+if not os.path.isfile('caption_model.pth'):
+    raise FileNotFoundError("caption_model.pth not found. Copy it from your notebook output into this folder.")
+
 with open('vocab.pkl', 'rb') as f:
     vocab = pickle.load(f)
 
-# loading model
 model = ImageCaptioningModel(len(vocab)).to(device)
 model.load_state_dict(torch.load('caption_model.pth', map_location=device))
 model.eval()
@@ -107,6 +112,8 @@ transform = transforms.Compose([
 
 # caption generation
 def generate_caption(image, search_type="Greedy"):
+    if image is None:
+        return "Please upload an image."
     # processing image
     img = Image.fromarray(image).convert('RGB')
     img_tensor = transform(img).unsqueeze(0).to(device)

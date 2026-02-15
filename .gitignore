@@ -42,6 +42,8 @@ env/
 # jupyter stuff
 .ipynb_checkpoints
 *.ipynb
+# allow assignment notebook
+!AI_ASS01_21F_9269*.ipynb
 
 # logs
 *.log
